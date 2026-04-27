@@ -21,14 +21,14 @@ export const Route = createFileRoute("/admin")({
 
 type Lead = {
   id: string;
-  name: string;
-  whatsapp: string;
+  full_name: string;
+  whatsapp_number: string;
   monthly_bill: number;
-  roof_space: string;
-  phase_type: string;
-  system_size_kw: number;
-  monthly_savings: number;
-  payback_years: number;
+  calculated_system_size: string;
+  estimated_savings: string;
+  roof_space: string | null;
+  phase_type: string | null;
+  payback_years: number | null;
   created_at: string;
 };
 
@@ -88,12 +88,14 @@ function AdminDashboard() {
       .from("solar_leads")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error && data) setLeads(data as Lead[]);
+    if (!error && data) setLeads(data as unknown as Lead[]);
     setLoading(false);
   };
 
-  const totalKw = leads.reduce((s, l) => s + Number(l.system_size_kw), 0);
-  const pipelineValue = leads.reduce((s, l) => s + Number(l.system_size_kw) * 160000, 0);
+  // Parse "5 kW" → 5 for aggregates
+  const parseKw = (s: string) => parseFloat(s) || 0;
+  const totalKw = leads.reduce((s, l) => s + parseKw(l.calculated_system_size), 0);
+  const pipelineValue = leads.reduce((s, l) => s + parseKw(l.calculated_system_size) * 160000, 0);
 
   if (!authChecked || !isAdmin) {
     return (
@@ -159,7 +161,7 @@ function AdminDashboard() {
                   <TableHead>Roof</TableHead>
                   <TableHead>Phase</TableHead>
                   <TableHead className="text-right">System</TableHead>
-                  <TableHead className="text-right">Savings/mo</TableHead>
+                  <TableHead className="text-right">Est. Savings</TableHead>
                   <TableHead className="text-right">Payback</TableHead>
                   <TableHead className="text-right">Submitted</TableHead>
                 </TableRow>
@@ -180,27 +182,35 @@ function AdminDashboard() {
                 ) : (
                   leads.map((l) => (
                     <TableRow key={l.id} className="hover:bg-muted/30">
-                      <TableCell className="font-semibold text-navy">{l.name}</TableCell>
+                      <TableCell className="font-semibold text-navy">{l.full_name}</TableCell>
                       <TableCell>
                         <a
-                          href={`https://wa.me/${l.whatsapp.replace(/[^\d]/g, "")}`}
+                          href={`https://wa.me/${l.whatsapp_number.replace(/[^\d]/g, "")}`}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1.5 text-primary-deep hover:text-primary font-medium"
                         >
-                          <Phone className="h-3.5 w-3.5" /> {l.whatsapp}
+                          <Phone className="h-3.5 w-3.5" /> {l.whatsapp_number}
                         </a>
                       </TableCell>
-                      <TableCell className="tabular-nums">PKR {l.monthly_bill.toLocaleString()}</TableCell>
-                      <TableCell><Badge variant="secondary" className="capitalize">{l.roof_space}</Badge></TableCell>
-                      <TableCell className="capitalize text-muted-foreground">{l.phase_type}</TableCell>
+                      <TableCell className="tabular-nums">PKR {Number(l.monthly_bill).toLocaleString()}</TableCell>
+                      <TableCell>
+                        {l.roof_space ? (
+                          <Badge variant="secondary" className="capitalize">{l.roof_space}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="capitalize text-muted-foreground">{l.phase_type ?? "—"}</TableCell>
                       <TableCell className="text-right font-bold tabular-nums text-primary-deep">
-                        {l.system_size_kw} kW
+                        {l.calculated_system_size}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        PKR {l.monthly_savings.toLocaleString()}
+                        {l.estimated_savings}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{l.payback_years} yrs</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {l.payback_years != null ? `${l.payback_years} yrs` : "—"}
+                      </TableCell>
                       <TableCell className="text-right text-muted-foreground text-sm">
                         {new Date(l.created_at).toLocaleDateString(undefined, {
                           month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
