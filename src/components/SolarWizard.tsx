@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { ArrowRight, ArrowLeft, Check, Zap, Home, Building2, Warehouse, Sun, TrendingUp, Clock, Loader2, Download, X, Sparkles } from "lucide-react";
@@ -73,13 +74,13 @@ export function SolarWizard({ onClose }: { onClose: () => void }) {
     if (!result || !roof || !phase) return;
     setSubmitting(true);
     const { error } = await supabase.from("solar_leads").insert({
-      name: parsed.data.name,
-      whatsapp: parsed.data.whatsapp,
+      full_name: parsed.data.name,
+      whatsapp_number: parsed.data.whatsapp,
       monthly_bill: bill,
+      calculated_system_size: `${result.recommendedKw} kW`,
+      estimated_savings: `PKR ${result.monthlySavings.toLocaleString()} / month`,
       roof_space: roof,
       phase_type: phase,
-      system_size_kw: result.recommendedKw,
-      monthly_savings: result.monthlySavings,
       payback_years: result.paybackYears,
     });
     setSubmitting(false);
@@ -88,6 +89,20 @@ export function SolarWizard({ onClose }: { onClose: () => void }) {
       return;
     }
     setSubmitted(true);
+    // 🎉 Confetti burst
+    const fire = (opts: confetti.Options) =>
+      confetti({
+        spread: 90,
+        ticks: 120,
+        gravity: 0.9,
+        decay: 0.94,
+        startVelocity: 35,
+        colors: ["#F59E0B", "#FBBF24", "#FDE68A", "#1E293B", "#FFFFFF"],
+        ...opts,
+      });
+    fire({ particleCount: 60, origin: { y: 0.7, x: 0.3 } });
+    fire({ particleCount: 60, origin: { y: 0.7, x: 0.7 } });
+    setTimeout(() => fire({ particleCount: 80, origin: { y: 0.6, x: 0.5 }, spread: 120 }), 250);
     toast.success("Proposal request received! Our team will WhatsApp you within 2 hours.");
   };
 
