@@ -50,6 +50,45 @@ export type Database = {
         }
         Relationships: []
       }
+      solar_leads: {
+        Row: {
+          created_at: string
+          id: string
+          monthly_bill: number
+          monthly_savings: number
+          name: string
+          payback_years: number
+          phase_type: string
+          roof_space: string
+          system_size_kw: number
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          monthly_bill: number
+          monthly_savings: number
+          name: string
+          payback_years: number
+          phase_type: string
+          roof_space: string
+          system_size_kw: number
+          whatsapp: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          monthly_bill?: number
+          monthly_savings?: number
+          name?: string
+          payback_years?: number
+          phase_type?: string
+          roof_space?: string
+          system_size_kw?: number
+          whatsapp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
