@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Sun, Users, TrendingUp, Zap, RefreshCw, Phone } from "lucide-react";
+import { Sun, Users, TrendingUp, Zap, RefreshCw, Phone, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminDashboard,
@@ -32,8 +33,54 @@ type Lead = {
 };
 
 function AdminDashboard() {
+  const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const verify = async (session: any) => {
+      if (!session) {
+        navigate({ to: "/login" });
+        return;
+      }
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!mounted) return;
+      if (error || !data) {
+        toast.error("Your account doesn't have admin access.");
+        await supabase.auth.signOut();
+        navigate({ to: "/login" });
+        return;
+      }
+      setIsAdmin(true);
+      setAuthChecked(true);
+      fetchLeads();
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) navigate({ to: "/login" });
+    });
+    supabase.auth.getSession().then(({ data }) => verify(data.session));
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
 
   const fetchLeads = async () => {
     setLoading(true);
@@ -45,10 +92,18 @@ function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchLeads(); }, []);
-
   const totalKw = leads.reduce((s, l) => s + Number(l.system_size_kw), 0);
   const pipelineValue = leads.reduce((s, l) => s + Number(l.system_size_kw) * 160000, 0);
+
+  if (!authChecked || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Verifying access…
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,11 +118,17 @@ function AdminDashboard() {
               <div className="text-[10px] uppercase tracking-widest text-primary-glow font-semibold mt-0.5">Admin · Leads</div>
             </div>
           </Link>
-          <Button variant="outline" size="sm" onClick={fetchLeads} disabled={loading}
-            className="bg-white/5 border-white/15 text-navy-foreground hover:bg-white/10 hover:text-navy-foreground">
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchLeads} disabled={loading}
+              className="bg-white/5 border-white/15 text-navy-foreground hover:bg-white/10 hover:text-navy-foreground">
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleLogout}
+              className="bg-white/5 border-white/15 text-navy-foreground hover:bg-white/10 hover:text-navy-foreground">
+              <LogOut className="h-4 w-4 mr-2" /> Logout
+            </Button>
+          </div>
         </div>
       </header>
 
