@@ -14,42 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      leads: {
-        Row: {
-          created_at: string
-          email: string
-          estimate_max: number
-          estimate_min: number
-          full_name: string
-          id: string
-          phone: string
-          service_type: string
-          yard_size: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          estimate_max: number
-          estimate_min: number
-          full_name: string
-          id?: string
-          phone: string
-          service_type: string
-          yard_size: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          estimate_max?: number
-          estimate_min?: number
-          full_name?: string
-          id?: string
-          phone?: string
-          service_type?: string
-          yard_size?: string
-        }
-        Relationships: []
-      }
       solar_leads: {
         Row: {
           created_at: string
