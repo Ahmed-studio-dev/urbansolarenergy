@@ -16,40 +16,40 @@ export type Database = {
     Tables: {
       solar_leads: {
         Row: {
+          calculated_system_size: string
           created_at: string
+          estimated_savings: string
+          full_name: string
           id: string
           monthly_bill: number
-          monthly_savings: number
-          name: string
-          payback_years: number
-          phase_type: string
-          roof_space: string
-          system_size_kw: number
-          whatsapp: string
+          payback_years: number | null
+          phase_type: string | null
+          roof_space: string | null
+          whatsapp_number: string
         }
         Insert: {
+          calculated_system_size: string
           created_at?: string
+          estimated_savings: string
+          full_name: string
           id?: string
           monthly_bill: number
-          monthly_savings: number
-          name: string
-          payback_years: number
-          phase_type: string
-          roof_space: string
-          system_size_kw: number
-          whatsapp: string
+          payback_years?: number | null
+          phase_type?: string | null
+          roof_space?: string | null
+          whatsapp_number: string
         }
         Update: {
+          calculated_system_size?: string
           created_at?: string
+          estimated_savings?: string
+          full_name?: string
           id?: string
           monthly_bill?: number
-          monthly_savings?: number
-          name?: string
-          payback_years?: number
-          phase_type?: string
-          roof_space?: string
-          system_size_kw?: number
-          whatsapp?: string
+          payback_years?: number | null
+          phase_type?: string | null
+          roof_space?: string | null
+          whatsapp_number?: string
         }
         Relationships: []
       }
