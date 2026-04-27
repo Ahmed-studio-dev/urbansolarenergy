@@ -32,9 +32,13 @@ export const Route = createRootRoute({
       { title: "Evergreen Lawn & Landscape — Instant Quote" },
       { name: "description", content: "Get an instant estimate for lawn mowing, tree trimming, and full landscaping. Trusted local pros. Free quote in 60 seconds." },
       { property: "og:title", content: "Evergreen Lawn & Landscape — Instant Quote" },
-      { property: "og:description", content: "Free instant estimate for lawn mowing, tree trimming, and landscaping." },
+      { property: "og:description", content: "Get an instant estimate for lawn mowing, tree trimming, and full landscaping. Trusted local pros. Free quote in 60 seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Evergreen Lawn & Landscape — Instant Quote" },
+      { name: "twitter:description", content: "Get an instant estimate for lawn mowing, tree trimming, and full landscaping. Trusted local pros. Free quote in 60 seconds." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/02bfc46a-94b2-47f6-9021-f3a00c884f32" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/02bfc46a-94b2-47f6-9021-f3a00c884f32" },
     ],
     links: [
       {
