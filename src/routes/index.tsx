@@ -18,6 +18,15 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [showWizard, setShowWizard] = useState(false);
 
+  const openCalculator = () => {
+    setShowWizard(true);
+    // Wait for the wizard to mount, then smoothly scroll it into view
+    setTimeout(() => {
+      const el = document.getElementById("calculator");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 80);
+  };
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* NAV */}
@@ -84,7 +93,7 @@ function Index() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Button
                 size="lg"
-                onClick={() => setShowWizard(true)}
+                onClick={openCalculator}
                 className="h-14 px-8 text-base bg-gradient-sun hover:opacity-95 text-primary-foreground shadow-orange font-bold"
               >
                 Calculate My Savings
@@ -112,7 +121,7 @@ function Index() {
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
             className="lg:col-span-5"
           >
-            <div className="bg-card text-foreground rounded-3xl p-6 md:p-7 shadow-elegant border border-white/10">
+            <div id="calculator" className="bg-card text-foreground rounded-3xl p-6 md:p-7 shadow-elegant border border-white/10 scroll-mt-24">
               {showWizard ? (
                 <SolarWizard onClose={() => setShowWizard(false)} />
               ) : (
@@ -132,7 +141,7 @@ function Index() {
                   </p>
                   <Button
                     size="lg"
-                    onClick={() => setShowWizard(true)}
+                    onClick={openCalculator}
                     className="w-full h-12 bg-gradient-sun hover:opacity-95 text-primary-foreground shadow-orange font-bold"
                   >
                     Start Calculator <ArrowRight className="h-4 w-4 ml-1" />
@@ -224,7 +233,7 @@ function Index() {
           </p>
           <Button
             size="lg"
-            onClick={() => setShowWizard(true)}
+            onClick={openCalculator}
             className="mt-7 h-14 px-8 bg-gradient-sun hover:opacity-95 text-primary-foreground shadow-orange font-bold"
           >
             Get My Free Solar Plan <ArrowRight className="h-5 w-5 ml-1" />
